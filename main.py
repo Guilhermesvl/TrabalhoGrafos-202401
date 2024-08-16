@@ -8,7 +8,7 @@ class LA:
         self.direcionado = direcionado
 
     def addAdjacencia(self):
-        for u, v, w in self.arestas:
+        for idArestas, u, v, w in self.arestas:
             self.la[u].append((v, w))
 
             if not self.direcionado:
@@ -21,13 +21,15 @@ class LA:
                 print(f'{adjacencia}({peso}) -> ', end='')
             print()
 
+    def getDirecionado(self):
+        return self.direcionado
     def getVertices(self):
         return self.vertices
     
     def getArestas(self):
         return self.arestas
     
-    #1
+    #1 (✔)
     def conexo(self):
         componente = 0
         visitados = [False] * len(self.vertices)
@@ -50,15 +52,78 @@ class LA:
     
     #2
     def bipartido(self):
-        print()
+        cor = [-1] * len(self.vertices)
 
-    #3
+        for inicio in range(len(self.vertices)):
+            if cor[inicio] == -1:
+                cor[inicio] = 0
+                fila = deque([inicio])
+
+                while fila:
+                    u = fila.popleft()
+                    for adjacencia, _ in self.la[u]:
+                        if cor[adjacencia] == -1:
+                            cor[adjacencia] = 1 - cor[u]
+                            fila.append(adjacencia)
+                        elif cor[adjacencia] == cor[u]:
+                            return 0
+        return 1
+
+    #3 (✔)
     def euleriano(self):
-        print()
+        if self.direcionado ==  True:
+            return -1
+        
+        for adjacencias in self.la:
+            if len(adjacencias) % 2 != 0:
+                return 0
+        return 1
+
     
-    #4
-    def possuiCiclo(self):
-        print()
+    #4 (✔)
+    def detectaCicloDirecionado(self):
+        estado = [0] * len(self.vertices)  # 0 = Não Visitado, 1 = Visitando, 2 = Visitado
+
+        def dfs(v):
+            if estado[v] == 1:  
+                return True
+            if estado[v] == 2:  
+                return False
+
+            estado[v] = 1 
+            for adjacencia, _ in self.la[v]:
+                if dfs(adjacencia):
+                    return True
+            estado[v] = 2  
+            return False
+
+        
+        for v in range(len(self.vertices)):
+            if estado[v] == 0 and dfs(v):
+                return 1  
+        return 0 
+
+    def detectaCicloNaoDirecionado(self):
+        visitados = [False] * len(self.vertices)
+        pais = [-1] * len(self.vertices) 
+
+        def dfs(v, pai):
+            visitados[v] = True
+            for adjacencia, _ in self.la[v]:
+                if not visitados[adjacencia]:
+                    pais[adjacencia] = v
+                    if dfs(adjacencia, v):
+                        return True
+                elif adjacencia != pai:  
+                    return True
+            return False
+
+        
+        for v in range(len(self.vertices)):
+            if not visitados[v]:
+                if dfs(v, -1):
+                    return 1  
+        return 0  
     
     ## Listar -------------------------------------------------------------------
     #5
@@ -117,9 +182,24 @@ def menu(qtVertices, qArestas, orientado):
 
     lista = LA(list(range(qtVertices)), arestas, orientado == 'direcionado')
     lista.addAdjacencia()
+
     lista.mostraLista()
+
     conexo = lista.conexo()
-    print(conexo)
+    print(conexo) #1
+
+    bipartido = lista.bipartido()
+    print(bipartido) #2
+
+    euleriano = lista.euleriano()
+    print(euleriano) #3
+
+    if lista.getDirecionado():
+        ciclo = lista.detectaCicloDirecionado() #4
+    else: 
+        ciclo = lista.detectaCicloNaoDirecionado() #4
+    print(ciclo)
+
 
 
 qtVertices, qArestas = map(int, input().split())
