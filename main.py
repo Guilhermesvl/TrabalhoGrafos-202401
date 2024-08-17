@@ -326,13 +326,73 @@ class LA:
         return pesosTotal
 
         
-    #12
+    #12 (✔)
     def ordemTopologica(self):
-        print()
+        if self.direcionado == False:
+            return -1
+        
+        def dfs(u, visitados, ordem, pilhaRecursiva):
+            visitados[u] =  True
+            pilhaRecursiva[u] = True
+            
+            adjacencias = sorted(self.la[u], key=lambda x : (x[0], x[1]))
 
-    #13
+            for v, _ in adjacencias:
+                if not visitados[v]:
+                    if dfs(v, visitados, ordem, pilhaRecursiva):
+                        return True
+                    
+                elif pilhaRecursiva[v]:
+                    return True #foi detectado um ciclo
+                
+            pilhaRecursiva[u] = False
+            ordem.append(u)
+            return False
+
+        visitados = [False] * len(self.vertices)
+        pilhaRecursiva = [False] * len(self.vertices)
+        ordem = []
+        
+        for u in sorted(range(len(self.vertices))):
+            if not visitados[u]:
+                if dfs(u, visitados, ordem, pilhaRecursiva):
+                    return -1   
+
+
+        ordem.reverse()         
+        return ordem
+
+    #13 (✔)
     def caminhoMinimo(self):
-        print()
+        if self.direcionado:
+            return -1
+        
+        #Belmond Ford
+        source = 0
+        destino = len(self.vertices) - 1 
+
+        distancia = [float('inf')] * len(self.vertices)
+        distancia[source] = 0
+
+        def relaxamento(u, v, w):
+            if distancia[u] + w < distancia[v]:
+                distancia[v] = distancia[u] + w
+
+        
+        for _ in range(destino):
+            for u in range(len(self.vertices)):
+                for v, w in self.la[u]:
+                    relaxamento(u, v, w)
+
+        
+        for u in range(destino):
+            for v, w in self.la[u]:
+                if distancia[u] + w < distancia[v]:
+                    return -1 #ciclo de peso negativo
+                
+
+        return distancia[destino] if distancia[destino] != float('inf') else -1
+
 
     #14
     def fluxoMaximo(self):
@@ -389,6 +449,12 @@ def menu(qtVertices, qArestas, orientado):
 
     geradora = lista.geradoraMinima() #11
     print(geradora)
+
+    ordenacaoTopologica = lista.ordemTopologica() #12
+    print(ordenacaoTopologica)
+
+    caminhoMinimo = lista.caminhoMinimo() #13
+    print(caminhoMinimo)
 
 
 qtVertices, qArestas = map(int, input().split())
