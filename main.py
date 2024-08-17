@@ -23,11 +23,19 @@ class LA:
 
     def getDirecionado(self):
         return self.direcionado
+    
     def getVertices(self):
         return self.vertices
     
     def getArestas(self):
         return self.arestas
+    
+    def getIdArestas(self, u, v, w):
+            for idArestas, u_, v_, w_ in self.arestas:
+                if(u == u_ and v == v_ and w == w_) or (not self.direcionado and 
+                                                   u == v_ and v == u_ and w == w_):
+                    return idArestas
+            return None
     
     #1 (✔)
     def conexo(self):
@@ -219,18 +227,10 @@ class LA:
             adjacencias = sorted(self.la[u], key=lambda x : (x[0], x[1]))
 
             for v, w, in adjacencias:
-                idArestas = getIdArestas(u, v, w)
+                idArestas = self.getIdArestas(u, v, w)
                 if not visitados[v]:
                     arestasFinais.append(idArestas)
                     dfs(v, visitados, arestasFinais)
-
-
-        def getIdArestas(u, v, w):
-            for idArestas, u_, v_, w_ in self.arestas:
-                if(u == u_ and v == v_ and w == w_) or (not self.direcionado and 
-                                                   u == v_ and v == u_ and w == w_):
-                    return idArestas
-            return None
 
         visitados = [False] * len(self.vertices)
         arestasFinais = []
@@ -243,14 +243,89 @@ class LA:
             
         return arestasFinais
     
-    #10
+    #10 (✔)
     def largura(self):
-        print()
+        visitados = [False] * len(self.vertices)
+        fila = deque()
+        arestasFinais = []
 
-    #11
+        def bfs(source):
+            fila.append(source)
+            visitados[source] = True
+
+            while fila:
+                u = fila.pop()
+                adjacencias = sorted(self.la[u], key = lambda x: (x[0], x[1]))
+
+                for v, w in adjacencias:
+                    if not visitados[v]:
+                        idAresta = self.getIdArestas(u, v, w)
+                        arestasFinais.append(idAresta)
+                        visitados[v] = True
+                        fila.append(v)
+
+        bfs(0)
+
+        for i in range(len(self.vertices)):
+            if not visitados[i]:
+                return arestasFinais
+            
+
+        return arestasFinais
+            
+        
+    #11 (✔)
     def geradoraMinima(self):
-        print()
+        if self.direcionado: 
+            return -1
+        
+        def encontrar(pai, vertice):
+            if pai[vertice] != vertice:
+                pai[vertice] = encontrar(pai, pai[vertice])
 
+            return pai[vertice]
+
+        def uniao(pai, rank, raizV, raizU):
+            if rank[raizU] < rank[raizV]:
+                pai[raizU] = raizV
+            elif rank[raizU] > rank[raizV]:
+                pai[raizV] = raizU
+            else:
+                pai[raizV] = raizU
+                rank[raizU] += 1
+
+
+        arestasOrdenadas = sorted(self.getArestas(), key = lambda x:x[3])
+
+        pai = []
+        rank = []
+
+        for v in range(len(self.vertices)):
+            pai.append(v)
+            rank.append(0)
+
+        pesosTotal = 0
+        iArestasOrdenadas = 0
+        numeroArestas = 0
+        parada = len(self.vertices)
+
+        while numeroArestas < parada - 1 and iArestasOrdenadas < len(arestasOrdenadas):
+            _, u, v, w = arestasOrdenadas[iArestasOrdenadas]
+
+            iArestasOrdenadas+= 1
+
+            raizU = encontrar(pai, u)
+            raizV = encontrar(pai, v)
+
+            if raizU != raizV:
+                numeroArestas += 1
+                pesosTotal += w
+
+                uniao(pai, rank, raizV, raizU)
+
+        return pesosTotal
+
+        
     #12
     def ordemTopologica(self):
         print()
@@ -308,6 +383,12 @@ def menu(qtVertices, qArestas, orientado):
 
     profundidade = lista.profundidade() #9
     print(profundidade)
+
+    largura = lista.largura() #10 
+    print(largura)
+
+    geradora = lista.geradoraMinima() #11
+    print(geradora)
 
 
 qtVertices, qArestas = map(int, input().split())
