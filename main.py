@@ -50,7 +50,7 @@ class LA:
             
         return 0 if componente > 1 else 1
     
-    #2
+    #2 (✔)
     def bipartido(self):
         cor = [-1] * len(self.vertices)
 
@@ -126,51 +126,144 @@ class LA:
         return 0  
     
     ## Listar -------------------------------------------------------------------
-    #5
-    def componentesConexas(self):
-        print()
 
-    #6
+    #5 (✔)
+    def componentesConexas(self):
+
+        if self.direcionado:
+            return -1
+        
+        componente = 0
+        visitados = [False] * len(self.vertices)
+        fila = deque()
+
+        for source in range(len(self.vertices)):
+            if not visitados[source]:
+                componente+=1
+                visitados[source-1] = True
+                fila.append(source)
+
+                while fila:
+                    u = fila.popleft()
+                    for adjacencia, _ in self.la[u]:
+                        if not visitados[adjacencia]:
+                            visitados[adjacencia] = True
+                            fila.append(adjacencia)
+
+        return componente
+
+    #6 (✔)
     def componentesFortementeConexas(self):
-        print()
+        if not self.direcionado:
+            return -1
+        
+        def dfs(u, visitados, fechamento):
+
+            visitados[u] = True
+            for v, _ in self.la[u]:
+                if not visitados[v]:
+                    dfs(v, visitados, fechamento)
+            fechamento.append(u)  
+
+        def dfsTransposto(u, visitados, componenteAtual):
+            visitados[u] = True
+            componenteAtual.append(u)
+            for v, _ in self.transposto[u]:
+                if not visitados[v]:
+                    dfsTransposto(v, visitados, componenteAtual)
+
+        visitados = [False] * len(self.vertices)
+        fechamento = []
+        
+        for u in range(len(self.vertices)):
+            if not visitados[u]:
+                dfs(u, visitados, fechamento)
+
+        self.transposto = [[] for _ in range(len(self.vertices))]
+        for u in range(len(self.vertices)):
+            for v, w in self.la[u]:
+                self.transposto[v].append((u, w))
+
+
+        visitados = [False] * len(self.vertices)
+        componente = 0
+
+        while fechamento:
+            u = fechamento.pop()
+            if not visitados[u]:
+                componenteAtual = []
+                dfsTransposto(u, visitados, componenteAtual)
+                componente += 1
+
+        return componente
     
-    #7
+    #7.1 -----EXTRA
     def trilhaEuleriana(self):
-        print()
+        print("EXTRA")
+
+    #7
+    def verticeArticulação(self):
+        print("AINDA NÃO FIZ")
 
     #8
-    def verticeArticulação(self):
-        print()
-
-    #9
     def arestasPonte(self):
-        print()
+        print('AINDA NÃO FIZ')
 
     #Gerar ------------------------------------------------------------------------
-    #10
+    #9 (✔)
     def profundidade(self):
-        print()
-    #11
+        
+        def dfs(u, visitados, arestasFinais):
+            visitados[u] = True
+
+            adjacencias = sorted(self.la[u], key=lambda x : (x[0], x[1]))
+
+            for v, w, in adjacencias:
+                idArestas = getIdArestas(u, v, w)
+                if not visitados[v]:
+                    arestasFinais.append(idArestas)
+                    dfs(v, visitados, arestasFinais)
+
+
+        def getIdArestas(u, v, w):
+            for idArestas, u_, v_, w_ in self.arestas:
+                if(u == u_ and v == v_ and w == w_) or (not self.direcionado and 
+                                                   u == v_ and v == u_ and w == w_):
+                    return idArestas
+            return None
+
+        visitados = [False] * len(self.vertices)
+        arestasFinais = []
+
+        dfs(0, visitados, arestasFinais)
+
+        for i in range(len(self.vertices)):
+            if not visitados[i]:
+                return arestasFinais
+            
+        return arestasFinais
+    
+    #10
     def largura(self):
         print()
 
-    #12
+    #11
     def geradoraMinima(self):
         print()
 
-    #13
+    #12
     def ordemTopologica(self):
         print()
 
-    #14
+    #13
     def caminhoMinimo(self):
         print()
 
-    #15
+    #14
     def fluxoMaximo(self):
         print()
 
-    #16
+    #15
     def fechoTransitivo(self):
         print()
 
@@ -200,6 +293,21 @@ def menu(qtVertices, qArestas, orientado):
         ciclo = lista.detectaCicloNaoDirecionado() #4
     print(ciclo)
 
+    componente = lista.componentesConexas() #5 
+    print(componente)
+
+    componenteFortemente = lista.componentesFortementeConexas() #6
+    print(componenteFortemente)
+
+    verticerticulacao = lista.verticeArticulação() #7
+    print(verticerticulacao)
+
+
+    arestaPonte = lista.arestasPonte() #8
+    print(arestaPonte)
+
+    profundidade = lista.profundidade() #9
+    print(profundidade)
 
 
 qtVertices, qArestas = map(int, input().split())
