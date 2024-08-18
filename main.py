@@ -39,9 +39,21 @@ class LA:
     
     #1 (✔)
     def conexo(self):
+        
         componente = 0
         visitados = [False] * len(self.vertices)
         fila = deque()
+
+        #Transforma o grafo em não orientado para testar conectividade fraca
+        if self.direcionado:
+            laNaoDirecionada = [[] for _ in range(len(self.vertices))]
+
+            for u in range(len(self.vertices)):
+                for _, v, w in self.arestas:
+                    laNaoDirecionada[u].append((v, w))
+                    laNaoDirecionada[v].append((u, w))
+            
+            self.la = laNaoDirecionada
 
         for source in range(len(self.vertices)):
             if not visitados[source]:
@@ -55,7 +67,7 @@ class LA:
                         if not visitados[adjacencia]:
                             visitados[adjacencia] = True
                             fila.append(adjacencia)
-            
+                            
         return 0 if componente > 1 else 1
     
     #2 (✔)
