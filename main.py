@@ -396,13 +396,13 @@ class LA:
 
     #14
     def fluxoMaximo(self):
-        print()
+        print("Ainda não fiz")
 
     #15
     def fechoTransitivo(self):
-        print()
+        print("Ainda não fiz")
 
-def menu(qtVertices, qArestas, orientado):
+def menu(qtVertices, qArestas, orientado, operacoes):
     arestas = []
     for _ in range(qArestas):
         idArestas, u, v, w = map(int, input().split())
@@ -411,53 +411,80 @@ def menu(qtVertices, qArestas, orientado):
     lista = LA(list(range(qtVertices)), arestas, orientado == 'direcionado')
     lista.addAdjacencia()
 
-    lista.mostraLista()
+    #lista.mostraLista() ----- Só para ver se esta adicionando da forma certa
 
-    conexo = lista.conexo()
-    print(conexo) #1
+    if operacoes[0] == 0:
+        operacoes = [indice + 1 for indice in operacoes]
 
-    bipartido = lista.bipartido()
-    print(bipartido) #2
+    for i in operacoes:
 
-    euleriano = lista.euleriano()
-    print(euleriano) #3
+        if i == 1:
+            conexo = lista.conexo()
+            print(conexo) #1
 
-    if lista.getDirecionado():
-        ciclo = lista.detectaCicloDirecionado() #4
-    else: 
-        ciclo = lista.detectaCicloNaoDirecionado() #4
-    print(ciclo)
+        elif i == 2:    
+            bipartido = lista.bipartido()
+            print(bipartido) #2
 
-    componente = lista.componentesConexas() #5 
-    print(componente)
+        elif i == 3:
+            euleriano = lista.euleriano()
+            print(euleriano) #3
 
-    componenteFortemente = lista.componentesFortementeConexas() #6
-    print(componenteFortemente)
+        elif i == 4:
+            if lista.getDirecionado():
+                ciclo = lista.detectaCicloDirecionado() #4
+            else: 
+                ciclo = lista.detectaCicloNaoDirecionado() #4
+            print(ciclo)
 
-    verticerticulacao = lista.verticeArticulação() #7
-    print(verticerticulacao)
+        elif i == 5:
+            componente = lista.componentesConexas() #5 
+            print(componente)
+
+        elif i == 6:
+            componenteFortemente = lista.componentesFortementeConexas() #6
+            print(componenteFortemente)
+
+        elif i == 7:
+            verticerticulacao = lista.verticeArticulação() #7
+            print(verticerticulacao)
+
+        elif i == 8:
+            arestaPonte = lista.arestasPonte() #8
+            print(arestaPonte)
+        
+        elif i == 9:
+            profundidade = lista.profundidade() #9
+            print(profundidade)
+
+        elif i == 10:
+            largura = lista.largura() #10 
+            print(largura)
+
+        elif i == 11:
+            geradora = lista.geradoraMinima() #11
+            print(geradora)
+
+        elif i == 12:
+            ordenacaoTopologica = lista.ordemTopologica() #12
+            print(ordenacaoTopologica)
+
+        elif i == 13:
+            caminhoMinimo = lista.caminhoMinimo() #13
+            print(caminhoMinimo)
+        
+        elif i == 14:
+            fluxoMaximo = lista.fluxoMaximo()
+            print(fluxoMaximo)
+
+        elif i == 15:
+            fechoTransitivo = lista.fechoTransitivo()
+            print(fechoTransitivo)
 
 
-    arestaPonte = lista.arestasPonte() #8
-    print(arestaPonte)
 
-    profundidade = lista.profundidade() #9
-    print(profundidade)
-
-    largura = lista.largura() #10 
-    print(largura)
-
-    geradora = lista.geradoraMinima() #11
-    print(geradora)
-
-    ordenacaoTopologica = lista.ordemTopologica() #12
-    print(ordenacaoTopologica)
-
-    caminhoMinimo = lista.caminhoMinimo() #13
-    print(caminhoMinimo)
-
-
+operacoes = list(map(int, input().split()))
 qtVertices, qArestas = map(int, input().split())
 orientado = str(input())
 
-menu(qtVertices, qArestas, orientado)
+menu(qtVertices, qArestas, orientado, operacoes)
