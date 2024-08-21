@@ -15,7 +15,7 @@ class LA:
             self.la[u].append((v, w, idArestas)) #LA[U] -> (v, w, id)
 
             if not self.direcionado:    #La[u] 
-                self.la[v].append((u, w, idArestas)) #LA[v] -> (u, w, id) 
+                self.la[v].append((v,  w, idArestas)) #LA[v] -> (u, w, id) 
 
     def mostraLista(self): 
         for i in range(len(self.vertices)):
@@ -475,43 +475,53 @@ class LA:
 
     def profundidade(self):
         """
-        Realiza uma busca em profundidade a partir do vértice inicial (vértice 0) em um grafo dirigido ou não dirigido.
-        Garante que as arestas sejam visitadas e retornadas na ordem lexicográfica dos vértices adjacentes.
+        Realiza uma busca em profundidade a partir do vértice inicial (vértice 0) em um grafo, seja dirigido ou não dirigido.
+        A função garante que as arestas sejam visitadas e retornadas na ordem lexicográfica dos vértices adjacentes.
 
-        A função realiza a seguinte operação:
-        1. Ordena as adjacências de cada vértice na ordem dos vértices de destino.
-        2. Realiza uma DFS a partir do vértice 0.
+        A função realiza as seguintes operações:
+        1. Ordena as adjacências de cada vértice pela ordem dos vértices de destino (lexicograficamente).
+        2. Realiza uma busca em profundidade a partir do vértice 0.
         3. Coleta e imprime os IDs das arestas visitadas durante a DFS.
 
-        A função segue os seguintes passos:
-        - Inicializa uma lista de visitados para garantir que cada vértice seja visitado apenas uma vez.
-        - Ordena as adjacências dos vértices para garantir que a DFS respeite a ordem lexicográfica.
-        - Realiza a busca em profundidade (DFS), registrando os IDs das arestas conforme elas são visitadas.
+        Passos detalhados:
+        - Inicializa uma lista `visitados` para garantir que cada vértice seja visitado apenas uma vez.
+        - Ordena as adjacências dos vértices para que a DFS respeite a ordem lexicográfica dos vértices adjacentes.
+        - Realiza a busca em profundidade (DFS) usando uma pilha para explorar os vértices e registra os IDs das arestas conforme elas são visitadas.
         - Imprime os IDs das arestas visitadas na ordem em que foram exploradas.
 
         Returns:
             None
-            print: os id's das arestas visitadas
-    """    
-        def dfs(u, visitados, arestasFinais):
-            
-            adjacencias = sorted(self.la[u], key=lambda x : (x[0], x[2]))
-            visitados[u] = True
-            for v, _, idArestas in adjacencias:
-                if not visitados[v]:
-                    arestasFinais.append(idArestas)
-                    dfs(v, visitados, arestasFinais)
-                    
-
-        visitados = [False] * len(self.vertices)
+            print: IDs das arestas visitadas, separados por espaços
+        """        
+        
+        visitados = [False] * len(self.vertices)  # Lista de visitados
         arestasFinais = []
 
-        dfs(0, visitados, arestasFinais)
-        
-        
+        def dfs(u):
+            pilha = [u]
+            while pilha:
+                v = pilha.pop()
+                if not visitados[v]:  # Verificar se o vértice ainda não foi visitado
+                    visitados[v] = True  # Marcar o vértice como visitado
+                    adjacencias = sorted(self.la[v], key=lambda x: (x[0]) )  # Ordenar por vértice (lexicograficamente)
+                    for vizinho, _, idAresta in adjacencias:
+                        if not visitados[vizinho]:
+                            arestasFinais.append(idAresta)
+                            pilha.append(vizinho)
+
+        # Realizar DFS a partir do vértice 0 e de outros vértices não visitados
+        dfs(0)  # Começa a DFS do vértice 0
+
+        for vertice in range(len(self.vertices)):
+            if not visitados[vertice]:
+                dfs(vertice)
+
         for resultado in arestasFinais:
-            print(resultado, end = ' ')
+            print(resultado, end=' ')
+
+
         
+
     #10 (✔)
     def largura(self):
 
